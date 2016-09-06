@@ -1,11 +1,11 @@
 {
   "name": "kaniku",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "MVC microframework for cocos2d-x javascript games",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "mocha",
-    "js": "coffee -c -o lib/ src/ && sed -i.bak \"s/require('\\(.*\\).coffee')/require('\\\\1.js')/\" lib/index.js && rm lib/*.bak",
+    "js": "coffee -c -o dist src && sed -i.bak \"s/require('\\(.*\\).coffee')/require('\\\\1.js')/\" dist/index.js && rm dist/*.bak",
     "prepublish": "npm run-script js"
   },
   "repository": {
