@@ -1,0 +1,32 @@
+{
+  "name": "kaniku",
+  "version": "1.0.2",
+  "description": "MVC microframework for cocos2d-x javascript games",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "mocha",
+    "js": "coffee -c -o lib/ src/ && sed -i.bak \"s/require('\\(.*\\).coffee')/require('\\\\1.js')/\" lib/index.js && rm lib/*.bak",
+    "prepublish": "npm run-script js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reo7sp/kaniku.git"
+  },
+  "keywords": [
+    "cocos", "cocos2d", "cocos2d-x", "mvc", "game", "games", "framework", "microframework"
+  ],
+  "author": "Oleg Morozenkov <a@reo7sp.ru>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/reo7sp/kaniku/issues"
+  },
+  "homepage": "https://github.com/reo7sp/kaniku#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "coffee-script": "^1.10.0",
+    "mocha": "^3.0.2"
+  },
+  "dependencies": {
+    "lodash": "^4.15.0"
+  }
+}
