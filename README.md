@@ -55,7 +55,7 @@ View provides interface between model and real world. Usually views are cocos2d-
 
 There are no kaniku class to extend from.
 
-Views don't commumicate with each other. They communicate through models.
+Views don't communicate with each other. They communicate through models.
 
 ## Controller
 Controller is something like glue between all components of the game. It creates models and views and links them with each other.
