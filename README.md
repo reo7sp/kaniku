@@ -6,7 +6,7 @@ Kaniku (Japanese: かにく) means flesh of a coconut.
 ## Model
 Model is the main source of information about game objects. All data flow must come through models.
 
-Models are able to emit events (views, other models, etc. are allowed to emit events on behalf of the model).
+Models are able to emit events. Views, other models, etc. are allowed to emit events on behalf of the model.
 
 Method to emit event:
 ```coffeescript
@@ -18,7 +18,7 @@ player.emit('died', killer: 'red pacman ghost', killerLevel: 10)
 
 Method to subscribe to events:
 ```coffeescript
-on: (listenKey, dataForListeners...)
+on: (listenKeys..., func)
 ```
 ```coffeescript
 player.on('win', (score) -> postScoreToTheSocialNetwork(score))
@@ -44,25 +44,25 @@ class PlayerModel extends kaniku.Model
 
 `defaults` static method sets initial values of model and also generates getters and setters for all listed variables.
 
-So it's important to list variables even with null values to let getters and setters to be automatically generated.
+So it's important to list variables even with null initial values to let getters and setters to be automatically generated.
 
 Generated setters emit event `change:VARIABLE_NAME`.
 
-`useUpdates` method requests controller to call model's `update` method on every frame. The first argument is time between frames.
+`useUpdates` method requests controller to call model's `update` method on every frame. The first argument of `update` method is time between frames.
 
 ## View
-View provides interface between model and real world. Usually views are cocos2d-x Node objects which render some game object on the user's screen.
+View provides interface between model and real world. Usually views are cocos2d-x Node objects which render game objects on the user's screen.
 
 There are no kaniku class to extend from.
 
-Views don't commumicate with each other. They commumicate through models.
+Views don't commumicate with each other. They communicate through models.
 
 ## Controller
-Controller is something like glue between all components of game. It creates models and views, links them with each other.
+Controller is something like glue between all components of the game. It creates models and views and links them with each other.
 
 Controllers are derived from cocos2d-x Scene class.
 
-Updaters do some global work which may affect anything inside controller or models. Updaters are called each frame.
+Updaters do some global work which may affect multiple views and models. Updaters are called each frame.
 
 Updater can be any object which has `update` method (for example, `kaniku.Updater`) or it can be just a function.
 
@@ -70,7 +70,7 @@ Example:
 ```coffeescript
 class FirstLevelController extends kaniku.Controller
   createModels: ->
-    @playerModel = new PlayerModel(y: 100) # you can override initial values
+    @playerModel = new PlayerModel(x: 0, y: 100) # you can override initial values
     @addModel(@playerModel)
 
     @npcModel = new FirstLevelNPCModel()
@@ -94,7 +94,7 @@ class FirstLevelController extends kaniku.Controller
     #
     # Score view will receive event that something was changed,
     # model will compute new score and then
-    # score view will update the label on screen using model data.
+    # score view will finally update the label on screen using model data.
     playerView.setPlayer(@playerModel)
     gameWorldLayer.addChild(playerView)
 
