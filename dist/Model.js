@@ -43,11 +43,13 @@
               });
               return this[varName] = newValue;
             };
-            return _this.prototype[updaterName] = function(func, newValue) {
+            return _this.prototype[updaterName] = function() {
+              var args, func;
+              func = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
               if (_.isString(func)) {
                 func = this.prototype[func];
               }
-              return this.prototype[setterName](func(this.prototype[getterName], newValue));
+              return this.prototype[setterName](func.apply(null, [this.prototype[getterName]].concat(slice.call(args))));
             };
           };
         })(this)(key, value));
