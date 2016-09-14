@@ -12,28 +12,38 @@
     }
 
     KanikuModel.defaults = function(defaults) {
-      var k, results, v;
+      var key, results, value;
       this.prototype.getDefaults = function() {
         return defaults;
       };
       results = [];
-      for (k in defaults) {
-        v = defaults[k];
+      for (key in defaults) {
+        value = defaults[key];
         results.push((function(_this) {
-          return function(k, v) {
-            _this.prototype[k] = v;
-            _this.prototype["get" + (_.upperFirst(_.camelCase(k)))] = function() {
-              return this[k];
+          return function(key, value) {
+            var camelCaseKey, getterName, pascalCaseKey, setterName, varName;
+            camelCaseKey = _.lowerFirst(_.camelCase(key));
+            pascalCaseKey = _.upperFirst(camelCaseKey);
+            varName = "_k_" + camelCaseKey;
+            if (camelCaseKey.startsWith('is')) {
+              getterName = camelCaseKey;
+            } else {
+              getterName = "get" + pascalCaseKey;
+            }
+            setterName = "set" + pascalCaseKey;
+            _this.prototype[varName] = value;
+            _this.prototype[getterName] = function() {
+              return this[varName];
             };
-            return _this.prototype["set" + (_.upperFirst(_.camelCase(k)))] = function(newValue) {
-              this.emit("change:" + k, newValue, {
-                was: this[k],
-                key: k
+            return _this.prototype[setterName] = function(newValue) {
+              this.emit("change:" + camelCaseKey, newValue, {
+                was: this[varName],
+                key: key
               });
-              return this[k] = newValue;
+              return this[varName] = newValue;
             };
           };
-        })(this)(k, v));
+        })(this)(key, value));
       }
       return results;
     };

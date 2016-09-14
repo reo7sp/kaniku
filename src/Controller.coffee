@@ -1,6 +1,7 @@
 module.exports = class KanikuController extends cc.Scene
   constructor: ->
     super
+
     @models = []
     @updaters = []
 
@@ -15,13 +16,16 @@ module.exports = class KanikuController extends cc.Scene
 
   update: (dt) ->
     super
+
     for updater in @updaters
       if updater.update?
         updater.update(dt)
       else
         updater(dt)
+
     for model in @models
       model.update(dt)
+
     return
 
   addModel: (model) ->

@@ -8,15 +8,22 @@ module.exports = class KanikuModel
   @defaults: (defaults) ->
     @prototype.getDefaults = -> defaults
 
-    for k, v of defaults
-      do (k, v) =>
-        @prototype[k] = v
+    for key, value of defaults
+      do (key, value) =>
+        camelCaseKey = _.lowerFirst(_.camelCase(key))
+        pascalCaseKey = _.upperFirst(camelCaseKey)
+        varName = "_k_#{camelCaseKey}"
+        if camelCaseKey.startsWith('is')
+          getterName = camelCaseKey
+        else
+          getterName = "get#{pascalCaseKey}"
+        setterName = "set#{pascalCaseKey}"
 
-        @prototype["get#{_.upperFirst(_.camelCase(k))}"] = -> @[k]
-
-        @prototype["set#{_.upperFirst(_.camelCase(k))}"] = (newValue) ->
-          @emit("change:#{k}", newValue, was: @[k], key: k)
-          @[k] = newValue
+        @prototype[varName] = value
+        @prototype[getterName] = -> @[varName]
+        @prototype[setterName] = (newValue) ->
+          @emit("change:#{camelCaseKey}", newValue, was: @[varName], key: key)
+          @[varName] = newValue
 
   @useUpdates: (value = true) ->
     @prototype.needsUpdating = value
