@@ -18,12 +18,16 @@ module.exports = class KanikuModel
         else
           getterName = "get#{pascalCaseKey}"
         setterName = "set#{pascalCaseKey}"
+        updaterName = "update#{pascalCaseKey}"
 
         @prototype[varName] = value
         @prototype[getterName] = -> @[varName]
         @prototype[setterName] = (newValue) ->
           @emit("change:#{camelCaseKey}", newValue, was: @[varName], key: key)
           @[varName] = newValue
+        @prototype[updaterName] = (func, newValue) ->
+          func = @prototype[func] if _.isString(func)
+          @prototype[setterName](func(@prototype[getterName], newValue))
 
   @useUpdates: (value = true) ->
     @prototype.needsUpdating = value

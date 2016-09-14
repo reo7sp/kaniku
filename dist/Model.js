@@ -21,7 +21,7 @@
         value = defaults[key];
         results.push((function(_this) {
           return function(key, value) {
-            var camelCaseKey, getterName, pascalCaseKey, setterName, varName;
+            var camelCaseKey, getterName, pascalCaseKey, setterName, updaterName, varName;
             camelCaseKey = _.lowerFirst(_.camelCase(key));
             pascalCaseKey = _.upperFirst(camelCaseKey);
             varName = "_k_" + camelCaseKey;
@@ -31,16 +31,23 @@
               getterName = "get" + pascalCaseKey;
             }
             setterName = "set" + pascalCaseKey;
+            updaterName = "update" + pascalCaseKey;
             _this.prototype[varName] = value;
             _this.prototype[getterName] = function() {
               return this[varName];
             };
-            return _this.prototype[setterName] = function(newValue) {
+            _this.prototype[setterName] = function(newValue) {
               this.emit("change:" + camelCaseKey, newValue, {
                 was: this[varName],
                 key: key
               });
               return this[varName] = newValue;
+            };
+            return _this.prototype[updaterName] = function(func, newValue) {
+              if (_.isString(func)) {
+                func = this.prototype[func];
+              }
+              return this.prototype[setterName](func(this.prototype[getterName], newValue));
             };
           };
         })(this)(key, value));
