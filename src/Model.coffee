@@ -2,11 +2,19 @@ _ = require 'lodash'
 
 module.exports = class KanikuModel
   constructor: (args) ->
-    _.assignIn(@, @getDefaults(), args)
+    _.assignIn(@, @_defaults) if @_defaults?
     @_listeners = {}
 
+    for key, value of args
+      camelCaseKey = _.lowerFirst(_.camelCase(key))
+      pascalCaseKey = _.upperFirst(camelCaseKey)
+      setterName = "set#{pascalCaseKey}"
+      @[setterName](value)
+
   @defaults: (defaults) ->
-    @prototype.getDefaults = -> defaults
+    @prototype._defaults = {}
+    prettyDefaults = {}
+    @prototype.getDefaults = -> prettyDefaults
 
     for key, value of defaults
       do (key, value) =>
@@ -20,14 +28,15 @@ module.exports = class KanikuModel
         setterName = "set#{pascalCaseKey}"
         updaterName = "update#{pascalCaseKey}"
 
-        @prototype[varName] = value
+        @prototype._defaults[varName] = value
+        prettyDefaults[camelCaseKey] = value
         @prototype[getterName] = -> @[varName]
         @prototype[setterName] = (newValue) ->
           @emit("change:#{camelCaseKey}", newValue, was: @[varName], key: key)
           @[varName] = newValue
         @prototype[updaterName] = (func, args...) ->
-          func = @prototype[func] if _.isString(func)
-          @prototype[setterName](func(@prototype[getterName], args...))
+          func = @[func] if _.isString(func)
+          @[setterName](func(@[getterName](), args...))
 
   @useUpdates: (value = true) ->
     @prototype.needsUpdating = -> value
@@ -36,13 +45,13 @@ module.exports = class KanikuModel
 
   on: (keys..., listener) ->
     for key in keys
-      @_listeners["change:#{key}"] ?= []
-      @_listeners["change:#{key}"].push(listener)
+      @_listeners[key] ?= []
+      @_listeners[key].push(listener)
     return
 
   removeListener: (keys..., listener) ->
     for key in keys
-      _.pull(@_listeners["change:#{key}"], listener)
+      _.pull(@_listeners[key], listener)
     return
 
   emit: (listenKey, args...) ->

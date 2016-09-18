@@ -7,14 +7,26 @@
 
   module.exports = KanikuModel = (function() {
     function KanikuModel(args) {
-      _.assignIn(this, this.getDefaults(), args);
+      var camelCaseKey, key, pascalCaseKey, setterName, value;
+      if (this._defaults != null) {
+        _.assignIn(this, this._defaults);
+      }
       this._listeners = {};
+      for (key in args) {
+        value = args[key];
+        camelCaseKey = _.lowerFirst(_.camelCase(key));
+        pascalCaseKey = _.upperFirst(camelCaseKey);
+        setterName = "set" + pascalCaseKey;
+        this[setterName](value);
+      }
     }
 
     KanikuModel.defaults = function(defaults) {
-      var key, results, value;
+      var key, prettyDefaults, results, value;
+      this.prototype._defaults = {};
+      prettyDefaults = {};
       this.prototype.getDefaults = function() {
-        return defaults;
+        return prettyDefaults;
       };
       results = [];
       for (key in defaults) {
@@ -32,7 +44,8 @@
             }
             setterName = "set" + pascalCaseKey;
             updaterName = "update" + pascalCaseKey;
-            _this.prototype[varName] = value;
+            _this.prototype._defaults[varName] = value;
+            prettyDefaults[camelCaseKey] = value;
             _this.prototype[getterName] = function() {
               return this[varName];
             };
@@ -47,9 +60,9 @@
               var args, func;
               func = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
               if (_.isString(func)) {
-                func = this.prototype[func];
+                func = this[func];
               }
-              return this.prototype[setterName](func.apply(null, [this.prototype[getterName]].concat(slice.call(args))));
+              return this[setterName](func.apply(null, [this[getterName]()].concat(slice.call(args))));
             };
           };
         })(this)(key, value));
@@ -71,14 +84,14 @@
     };
 
     KanikuModel.prototype.on = function() {
-      var base, i, j, key, keys, len, listener, name;
+      var base, i, j, key, keys, len, listener;
       keys = 2 <= arguments.length ? slice.call(arguments, 0, i = arguments.length - 1) : (i = 0, []), listener = arguments[i++];
       for (j = 0, len = keys.length; j < len; j++) {
         key = keys[j];
-        if ((base = this._listeners)[name = "change:" + key] == null) {
-          base[name] = [];
+        if ((base = this._listeners)[key] == null) {
+          base[key] = [];
         }
-        this._listeners["change:" + key].push(listener);
+        this._listeners[key].push(listener);
       }
     };
 
@@ -87,7 +100,7 @@
       keys = 2 <= arguments.length ? slice.call(arguments, 0, i = arguments.length - 1) : (i = 0, []), listener = arguments[i++];
       for (j = 0, len = keys.length; j < len; j++) {
         key = keys[j];
-        _.pull(this._listeners["change:" + key], listener);
+        _.pull(this._listeners[key], listener);
       }
     };
 
