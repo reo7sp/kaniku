@@ -1,6 +1,6 @@
 {
   "name": "kaniku",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "MVC microframework for cocos2d-x javascript games",
   "main": "dist/index.js",
   "scripts": {

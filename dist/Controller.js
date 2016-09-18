@@ -21,7 +21,7 @@
       if (this.updaters.length > 0 || this.models.some(function(it) {
         return it.needsUpdating();
       })) {
-        return this.scheduleUpdates();
+        return this.scheduleUpdate();
       }
     };
 

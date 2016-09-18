@@ -12,7 +12,7 @@ module.exports = class KanikuController extends cc.Scene
     @createViews()
     @createUpdaters()
 
-    @scheduleUpdates() if @updaters.length > 0 or @models.some((it) -> it.needsUpdating())
+    @scheduleUpdate() if @updaters.length > 0 or @models.some((it) -> it.needsUpdating())
 
   update: (dt) ->
     super
