@@ -61,10 +61,14 @@
       if (value == null) {
         value = true;
       }
-      return this.prototype.needsUpdating = value;
+      return this.prototype.needsUpdating = function() {
+        return value;
+      };
     };
 
-    KanikuModel.prototype.needsUpdating = false;
+    KanikuModel.prototype.needsUpdating = function() {
+      return false;
+    };
 
     KanikuModel.prototype.on = function() {
       var base, i, j, key, keys, len, listener, name;

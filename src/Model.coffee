@@ -30,9 +30,9 @@ module.exports = class KanikuModel
           @prototype[setterName](func(@prototype[getterName], args...))
 
   @useUpdates: (value = true) ->
-    @prototype.needsUpdating = value
+    @prototype.needsUpdating = -> value
 
-  needsUpdating: false
+  needsUpdating: -> false
 
   on: (keys..., listener) ->
     for key in keys
