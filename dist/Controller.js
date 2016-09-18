@@ -15,13 +15,13 @@
 
     KanikuController.prototype.onEnter = function() {
       KanikuController.__super__.onEnter.apply(this, arguments);
-      createModels();
-      createViews();
-      createUpdaters();
+      this.createModels();
+      this.createViews();
+      this.createUpdaters();
       if (this.updaters.length > 0 || this.models.some(function(it) {
         return it.needsUpdating();
       })) {
-        return scheduleUpdates();
+        return this.scheduleUpdates();
       }
     };
 

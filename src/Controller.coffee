@@ -8,11 +8,11 @@ module.exports = class KanikuController extends cc.Scene
   onEnter: ->
     super
 
-    createModels()
-    createViews()
-    createUpdaters()
+    @createModels()
+    @createViews()
+    @createUpdaters()
 
-    scheduleUpdates() if @updaters.length > 0 or @models.some((it) -> it.needsUpdating())
+    @scheduleUpdates() if @updaters.length > 0 or @models.some((it) -> it.needsUpdating())
 
   update: (dt) ->
     super

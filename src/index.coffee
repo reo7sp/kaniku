@@ -1,4 +1,8 @@
+Model = require('./Model.coffee')
+Controller = require('./Controller.coffee')
+Updater = require('./Updater.coffee')
+
 module.exports =
-  Model: require('./Model.coffee')
-  Controller: require('./Controller.coffee')
-  Updater: require('./Updater.coffee')
+  Model: Model
+  Controller: Controller
+  Updater: Updater
