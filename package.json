@@ -4,9 +4,9 @@
   "description": "MVC microframework for cocos2d-x javascript games",
   "main": "dist/index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --compilers coffee:coffee-script/register",
     "js": "coffee -c -o dist src && sed -i.bak \"s/require('\\(.*\\).coffee')/require('\\\\1.js')/\" dist/index.js && rm dist/*.bak",
-    "prepublish": "npm run-script js"
+    "prepublish": "npm run js"
   },
   "repository": {
     "type": "git",
