@@ -1,7 +1,8 @@
 global.cc =
-  Scene:
+  Scene: class
     onEnter: ->
     update: ->
+    scheduleUpdate: ->
 
 expect = require('chai').expect
 kaniku = require('../src/index.coffee')
@@ -18,15 +19,16 @@ describe 'Controller', ->
       @functionUpdaterCallback
       @classUpdaterCallback
     ) ->
+      super
 
     createModels: ->
-      @createModelsCallback()
+      @createModelsCallback?()
 
       class T1 extends kaniku.Model
         @useUpdates()
         constructor: (@callback) ->
         update: ->
-          @callback(arguments)
+          @callback?(arguments...)
 
       class T2 extends T1
         @useUpdates(false)
@@ -38,16 +40,17 @@ describe 'Controller', ->
       @addModel @testModelNoUpdates
 
     createViews: ->
-      @createViewsCallback()
+      @createViewsCallback?()
 
     createUpdaters: ->
-      @createUpdatersCallback()
+      @createUpdatersCallback?()
 
       class T extends kaniku.Updater
-        update: (dt) -> @classUpdaterCallback(arguments)
+        constructor: (@callback) ->
+        update: -> @callback?(arguments...)
 
-      @addUpdater -> @functionUpdaterCallback(arguments)
-      @addUpdater new T
+      @addUpdater => @functionUpdaterCallback?(arguments...)
+      @addUpdater new T(@classUpdaterCallback)
 
   describe '#onEnter', ->
     it 'calls #create* methods', ->
@@ -59,13 +62,13 @@ describe 'Controller', ->
         -> viewsCreated = true
         -> updatersCreated = true
       )
-      expect(modelsCreated).to.be.false()
-      expect(viewsCreated).to.be.false()
-      expect(updatersCreated).to.be.false()
+      expect(modelsCreated).to.be.false
+      expect(viewsCreated).to.be.false
+      expect(updatersCreated).to.be.false
       t.onEnter()
-      expect(modelsCreated).to.be.true()
-      expect(viewsCreated).to.be.true()
-      expect(updatersCreated).to.be.true()
+      expect(modelsCreated).to.be.true
+      expect(viewsCreated).to.be.true
+      expect(updatersCreated).to.be.true
 
   describe '#update', ->
     it 'updates models', ->
@@ -73,14 +76,15 @@ describe 'Controller', ->
       model2Updated = false
       t = new TestController(
         null, null, null
-        -> model1Updated = true
-        -> model2Updated = true
+        (dt) -> model1Updated = true; expect(dt).to.equal(1)
+        (dt) -> model2Updated = true; expect(dt).to.equal(1)
       )
-      expect(model1Updated).to.be.false()
-      expect(model2Updated).to.be.false()
+      expect(model1Updated).to.be.false
+      expect(model2Updated).to.be.false
+      t.onEnter()
       t.update(1)
-      expect(model1Updated).to.be.true()
-      expect(model2Updated).to.be.false()
+      expect(model1Updated).to.be.true
+      expect(model2Updated).to.be.false
 
     it 'updates updaters', ->
       updater1Updated = false
@@ -88,14 +92,15 @@ describe 'Controller', ->
       t = new TestController(
         null, null, null
         null, null
-        -> updater1Updated = true
-        -> updater2Updated = true
+        (dt) -> updater1Updated = true; expect(dt).to.equal(1)
+        (dt) -> updater2Updated = true; expect(dt).to.equal(1)
       )
-      expect(updater1Updated).to.be.false()
-      expect(updater2Updated).to.be.false()
+      expect(updater1Updated).to.be.false
+      expect(updater2Updated).to.be.false
+      t.onEnter()
       t.update(1)
-      expect(updater1Updated).to.be.true()
-      expect(updater2Updated).to.be.true()
+      expect(updater1Updated).to.be.true
+      expect(updater2Updated).to.be.true
 
 
 describe 'Model', ->
@@ -157,16 +162,16 @@ describe 'Model', ->
       t.on 'change:z', ->
         listenerExecutedZ = true
 
-      expect(listenerExecutedX).to.be.false()
-      expect(listenerExecutedY).to.be.false()
-      expect(listenerExecutedZ).to.be.false()
+      expect(listenerExecutedX).to.be.false
+      expect(listenerExecutedY).to.be.false
+      expect(listenerExecutedZ).to.be.false
 
       t.setX(111)
       t.y = 222
 
-      expect(listenerExecutedX).to.be.true()
-      expect(listenerExecutedY).to.be.true()
-      expect(listenerExecutedZ).to.be.false()
+      expect(listenerExecutedX).to.be.true
+      expect(listenerExecutedY).to.be.true
+      expect(listenerExecutedZ).to.be.false
 
     it 'emit event on change of computed properties', ->
       class T extends TestModel
@@ -179,9 +184,9 @@ describe 'Model', ->
       t.on 'change:w', ->
         listenerExecuted = true
 
-      expect(listenerExecuted).to.be.false()
+      expect(listenerExecuted).to.be.false
       t.setX(111)
-      expect(listenerExecuted).to.be.true()
+      expect(listenerExecuted).to.be.true
 
   describe '.getDefaults', ->
     it 'returns object supplied to .defaults method', ->
@@ -202,9 +207,9 @@ describe 'Model', ->
       t1 = new T1
       t2 = new T2
       t3 = new T3
-      expect(t1.needsUpdating()).to.be.false()
-      expect(t2.needsUpdating()).to.be.true()
-      expect(t3.needsUpdating()).to.be.false()
+      expect(t1.needsUpdating()).to.be.false
+      expect(t2.needsUpdating()).to.be.true
+      expect(t3.needsUpdating()).to.be.false
 
   describe '#on', ->
     it 'registers listener', ->
