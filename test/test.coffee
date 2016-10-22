@@ -175,7 +175,7 @@ describe 'Model', ->
 
     it 'emit event on change of computed properties', ->
       class T extends TestModel
-        @computed 'getW', depends: ['x', 'y']
+        @computed 'w', depends: ['x', 'y']
         getW: ->
           @getX() + @getY()
 
@@ -216,7 +216,7 @@ describe 'Model', ->
       t = new TestModel
       f = ->
       t.on('test-event', f)
-      expect(t._listeners['test-event']).to.exist()
+      expect(t._listeners['test-event']).to.exist
       expect(t._listeners['test-event']).to.include(f)
 
   describe '#removeListener', ->
@@ -280,7 +280,7 @@ describe 'Model', ->
 
     it 'includes computed properties', ->
       class T extends TestModel
-        @computed 'getW', depends: ['x', 'y']
+        @computed 'w', depends: ['x', 'y']
         getW: ->
           @getX() + @getY()
 

@@ -40,7 +40,9 @@
       ref1 = this.models;
       for (j = 0, len1 = ref1.length; j < len1; j++) {
         model = ref1[j];
-        model.update(dt);
+        if (model.needsUpdating()) {
+          model.update(dt);
+        }
       }
     };
 
