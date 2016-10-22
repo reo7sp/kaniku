@@ -6,22 +6,29 @@ module.exports = class KanikuModel
     @_listeners = {}
 
     for key, value of args
-      camelCaseKey = _.lowerFirst(_.camelCase(key))
-      pascalCaseKey = _.upperFirst(camelCaseKey)
+      pascalCaseKey = _.upperFirst(_.camelCase(key))
       setterName = "set#{pascalCaseKey}"
       @[setterName](value)
 
   @defaults: (defaults) ->
-    @prototype._defaults = {}
     prettyDefaults = {}
+    @prototype._defaults = {}
     @prototype.getDefaults = -> prettyDefaults
 
     for key, value of defaults
       do (key, value) =>
-        camelCaseKey = _.lowerFirst(_.camelCase(key))
+        camelCaseKey = _.camelCase(key)
         pascalCaseKey = _.upperFirst(camelCaseKey)
         varName = "_k_#{camelCaseKey}"
-        if camelCaseKey.startsWith('is')
+
+        @prototype._propertiesWithoutAccessorPrefix ?= []
+        hasNoPrefix = @prototype._propertiesWithoutAccessorPrefix.includes(camelCaseKey)
+        unless hasNoPrefix
+          boolMethodPrefixes = ['is', 'are', 'do', 'does', 'have', 'has', 'need', 'needs', 'can', 'could', 'able', 'want', 'wants']
+          isBool = _(boolMethodPrefixes).some((it) -> camelCaseKey.startsWith(it))
+          hasNoPrefix = isBool
+
+        if hasNoPrefix
           getterName = camelCaseKey
         else
           getterName = "get#{pascalCaseKey}"
@@ -30,6 +37,7 @@ module.exports = class KanikuModel
 
         @prototype._defaults[varName] = value
         prettyDefaults[camelCaseKey] = value
+
         @prototype[getterName] = -> @[varName]
         @prototype[setterName] = (newValue) ->
           @emit("change:#{camelCaseKey}", newValue, was: @[varName], key: key)
@@ -38,8 +46,22 @@ module.exports = class KanikuModel
           func = @[func] if _.isString(func)
           @[setterName](func(@[getterName](), args...))
 
+        Object.defineProperty @prototype, camelCaseKey,
+          get: -> @[getterName]()
+          set: -> @[setterName](arguments...)
+          enumerable: true
+          configurable: true
+
+  @noAccessorPrefix: (key) ->
+    @prototype._propertiesWithoutAccessorPrefix ?= []
+    @prototype._propertiesWithoutAccessorPrefix.push(_.camelCase(key))
+
   @useUpdates: (value = true) ->
     @prototype.needsUpdating = -> value
+
+  @getDefaults: -> {}
+
+  @needsUpdating: -> @prototype.needsUpdating()
 
   needsUpdating: -> false
 

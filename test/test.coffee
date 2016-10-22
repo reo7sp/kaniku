@@ -141,10 +141,10 @@ describe 'Model', ->
 
     it 'create getters and setters property-style', ->
       t = new TestModel(x: 111)
-      expect(t).to.ownProperty('x')
-      expect(t).to.ownProperty('y')
-      expect(t).to.ownProperty('z')
-      t.y = 111
+      expect(t).to.have.property('x')
+      expect(t).to.have.property('y')
+      expect(t).to.have.property('z')
+      t.y = 222
       expect(t.x).to.equal(111)
       expect(t.y).to.equal(222)
       expect(t.z).to.equal(3)
