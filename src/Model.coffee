@@ -23,7 +23,7 @@ module.exports = class KanikuModel
     (@_kanikuData ? {}).data ? {}
 
   @defaults: (defaults) ->
-    prettyDefaults = @::getDefaults()
+    prettyDefaults = _.cloneDeep(@::getDefaults())
     @_getKanikuData().defaults ?= {}
     @::getDefaults = -> prettyDefaults
 

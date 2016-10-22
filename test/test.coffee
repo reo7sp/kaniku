@@ -192,6 +192,16 @@ describe 'Model', ->
     it 'returns object supplied to .defaults method', ->
       expect(TestModel.getDefaults()).to.eql({x: 1, y: 2, z: 3})
 
+    it 'nests defaults in derivative classes', ->
+      expect(TestModel.getDefaults()).to.eql({x: 1, y: 2, z: 3})
+
+      class T extends TestModel
+        @defaults
+          a: 4
+      expect(T.getDefaults()).to.eql({x: 1, y: 2, z: 3, a: 4})
+
+      expect(TestModel.getDefaults()).to.eql({x: 1, y: 2, z: 3})
+
     it 'returns empty object when no defaults available', ->
       class T extends kaniku.Model
       expect(T.getDefaults()).to.eql({})
@@ -262,6 +272,16 @@ describe 'Model', ->
     it 'returns object supplied to .defaults method', ->
       t = new TestModel
       expect(t.getDefaults()).to.eql({x: 1, y: 2, z: 3})
+
+    it 'nests defaults in derivative classes', ->
+      t1 = new TestModel
+      expect(t1.getDefaults()).to.eql({x: 1, y: 2, z: 3})
+
+      class T extends TestModel
+        @defaults
+          a: 4
+      t2 = new T
+      expect(t2.getDefaults()).to.eql({x: 1, y: 2, z: 3, a: 4})
 
     it 'returns empty object when no defaults available', ->
       class T extends kaniku.Model
