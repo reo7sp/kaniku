@@ -7,27 +7,104 @@ expect = require('chai').expect
 kaniku = require('../src/index.coffee')
 
 
-class TestModel extends kaniku.Model
-  @defaults
-    x: 1
-    y: 2
-    z: 3
-
-  @useUpdates()
-
-
-class TestController extends kaniku.Controller
-  createModels: ->
-    @testModel = new TestModel()
-    @addModel @testModel
-
-
 describe 'Controller', ->
-  describe '#onEnter', -> # TODO
-  describe '#update', -> # TODO
+  class TestController extends kaniku.Controller
+    constructor: (
+      @createModelsCallback,
+      @createViewsCallback,
+      @createUpdatersCallback
+      @updateModelCallback,
+      @dontUpdateModelCallback,
+      @functionUpdaterCallback
+      @classUpdaterCallback
+    ) ->
+
+    createModels: ->
+      @createModelsCallback()
+
+      class T1 extends kaniku.Model
+        @useUpdates()
+        constructor: (@callback) ->
+        update: ->
+          @callback(arguments)
+
+      class T2 extends T1
+        @useUpdates(false)
+
+      @testModel = new T1(@updateModelCallback)
+      @addModel @testModel
+
+      @testModelNoUpdates = new T2(@dontUpdateModelCallback)
+      @addModel @testModelNoUpdates
+
+    createViews: ->
+      @createViewsCallback()
+
+    createUpdaters: ->
+      @createUpdatersCallback()
+
+      class T extends kaniku.Updater
+        update: (dt) -> @classUpdaterCallback(arguments)
+
+      @addUpdater -> @functionUpdaterCallback(arguments)
+      @addUpdater new T
+
+  describe '#onEnter', ->
+    it 'calls #create* methods', ->
+      modelsCreated = false
+      viewsCreated = false
+      updatersCreated = false
+      t = new TestController(
+        -> modelsCreated = true
+        -> viewsCreated = true
+        -> updatersCreated = true
+      )
+      expect(modelsCreated).to.be.false()
+      expect(viewsCreated).to.be.false()
+      expect(updatersCreated).to.be.false()
+      t.onEnter()
+      expect(modelsCreated).to.be.true()
+      expect(viewsCreated).to.be.true()
+      expect(updatersCreated).to.be.true()
+
+  describe '#update', ->
+    it 'updates models', ->
+      model1Updated = false
+      model2Updated = false
+      t = new TestController(
+        null, null, null
+        -> model1Updated = true
+        -> model2Updated = true
+      )
+      expect(model1Updated).to.be.false()
+      expect(model2Updated).to.be.false()
+      t.update(1)
+      expect(model1Updated).to.be.true()
+      expect(model2Updated).to.be.false()
+
+    it 'updates updaters', ->
+      updater1Updated = false
+      updater2Updated = false
+      t = new TestController(
+        null, null, null
+        null, null
+        -> updater1Updated = true
+        -> updater2Updated = true
+      )
+      expect(updater1Updated).to.be.false()
+      expect(updater2Updated).to.be.false()
+      t.update(1)
+      expect(updater1Updated).to.be.true()
+      expect(updater2Updated).to.be.true()
 
 
 describe 'Model', ->
+  class TestModel extends kaniku.Model
+    @defaults
+      x: 1
+      y: 2
+      z: 3
+
   describe 'constructor', ->
     it 'creates new object with defaults', ->
       t = new TestModel
@@ -137,6 +214,15 @@ describe 'Model', ->
       expect(t._listeners['test-event']).to.exist()
       expect(t._listeners['test-event']).to.include(f)
 
+  describe '#removeListener', ->
+    it 'unregisters listener', ->
+      t = new TestModel
+      f = ->
+      t.on('test-event', f)
+      expect(t._listeners['test-event']).to.include(f)
+      t.removeListener('test-event', f)
+      expect(t._listeners['test-event']).not.to.include(f)
+
   describe '#emit', ->
     it 'sends data to listeners', ->
       t = new TestModel
@@ -166,15 +252,6 @@ describe 'Model', ->
       expect(receivedEvent1).to.eql({ok: true})
       expect(receivedEvent2).to.eql({ok: true})
       expect(receivedEvent3).to.eql({ok: true})
-
-  describe '#removeListener', ->
-    it 'unregisters listener', ->
-      t = new TestModel
-      f = ->
-      t.on('test-event', f)
-      expect(t._listeners['test-event']).to.include(f)
-      t.removeListener('test-event', f)
-      expect(t._listeners['test-event']).not.to.include(f)
 
   describe '#getDefaults', ->
     it 'returns object supplied to .defaults method', ->

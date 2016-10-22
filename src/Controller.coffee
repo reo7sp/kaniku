@@ -24,7 +24,7 @@ module.exports = class KanikuController extends cc.Scene
         updater(dt)
 
     for model in @models
-      model.update(dt)
+      model.update(dt) if @model.needsUpdating()
 
     return
 
