@@ -46,7 +46,7 @@
 
     KanikuModel.defaults = function(defaults) {
       var base, key, prettyDefaults, results, value;
-      prettyDefaults = this.prototype.getDefaults();
+      prettyDefaults = _.cloneDeep(this.prototype.getDefaults());
       if ((base = this._getKanikuData()).defaults == null) {
         base.defaults = {};
       }

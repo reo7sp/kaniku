@@ -197,8 +197,9 @@ describe 'Model', ->
 
       class T extends TestModel
         @defaults
+          x: 111
           a: 4
-      expect(T.getDefaults()).to.eql({x: 1, y: 2, z: 3, a: 4})
+      expect(T.getDefaults()).to.eql({x: 111, y: 2, z: 3, a: 4})
 
       expect(TestModel.getDefaults()).to.eql({x: 1, y: 2, z: 3})
 
@@ -279,9 +280,10 @@ describe 'Model', ->
 
       class T extends TestModel
         @defaults
+          x: 111
           a: 4
       t2 = new T
-      expect(t2.getDefaults()).to.eql({x: 1, y: 2, z: 3, a: 4})
+      expect(t2.getDefaults()).to.eql({x: 111, y: 2, z: 3, a: 4})
 
     it 'returns empty object when no defaults available', ->
       class T extends kaniku.Model
