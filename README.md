@@ -38,6 +38,7 @@ class PlayerModel extends kaniku.Model
   update: (dt) ->
     @setTimeAlive(@getTimeAlive() + dt)
 
+  @computed 'score', depends: ['x', 'timeAlive', 'timeAliveScoreFactor']
   getScore: ->
     @getX() + @getTimeAlive() * @getTimeAliveScoreFactor()
 ```
@@ -46,9 +47,16 @@ class PlayerModel extends kaniku.Model
 
 So it's important to list variables even with null initial values to let getters and setters to be automatically generated.
 
+Getters and setters are available both method-style (`m.getX()`, `m.setX(1)`) and property-style (`m.x`, `m.x = 1`). 
+
 Generated setters emit event `change:VARIABLE_NAME`.
 
-`useUpdates` method requests controller to call model's `update` method on every frame. The first argument of `update` method is time between frames.
+You can define computed variables via `computed` static method. This method makes change event of this computed variable to be emited on depending variable change. Also it creates property alias for getter.
+
+`useUpdates` method requests controller to call model's `update` method on every frame. The first argument of `update` method is time between frames in seconds.
+
+To get defaults of model you can use method `getDefaults` which is available both for class and for instances. To get all variables of model (including computed) you can use method `getData`.
+
 
 ## View
 View provides interface between model and real world. Usually views are cocos2d-x Node objects which render game objects on the user's screen.
