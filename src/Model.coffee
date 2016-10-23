@@ -78,8 +78,8 @@ module.exports = class KanikuModel
 
     @_getKanikuData().madePropAccessors ?= []
     madeAccessors = @_getKanikuData().madePropAccessors[camelCaseKey] = {}
-    madeAccessors.getter = getterName if getter
-    madeAccessors.setter = setterName if setter
+    madeAccessors.getter = getterName if getter or getterProperty
+    madeAccessors.setter = setterName if setter or setterProperty
 
   @_remakeAccessorsForProp: (key) ->
     camelCaseKey = _.camelCase(key)

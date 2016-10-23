@@ -74,8 +74,8 @@
     };
 
     KanikuModel._makeAccessorsForProp = function(key, arg) {
-      var base, base1, boolMethodPrefixes, camelCaseKey, getter, getterName, getterProperty, hasNoPrefix, isBool, pascalCaseKey, propertySettings, ref, ref1, ref2, ref3, ref4, setter, setterName, setterProperty, updaterName, varName;
-      ref = arg != null ? arg : {}, getter = (ref1 = ref.getter) != null ? ref1 : false, setter = (ref2 = ref.setter) != null ? ref2 : false, getterProperty = (ref3 = ref.getterProperty) != null ? ref3 : null, setterProperty = (ref4 = ref.setterProperty) != null ? ref4 : null;
+      var base, base1, boolMethodPrefixes, camelCaseKey, getter, getterName, getterProperty, hasNoPrefix, isBool, madeAccessors, pascalCaseKey, propertySettings, ref, ref1, ref2, ref3, ref4, ref5, setter, setterName, setterProperty, updater, updaterName, varName;
+      ref = arg != null ? arg : {}, getter = (ref1 = ref.getter) != null ? ref1 : false, setter = (ref2 = ref.setter) != null ? ref2 : false, updater = (ref3 = ref.updater) != null ? ref3 : null, getterProperty = (ref4 = ref.getterProperty) != null ? ref4 : null, setterProperty = (ref5 = ref.setterProperty) != null ? ref5 : null;
       camelCaseKey = _.camelCase(key);
       pascalCaseKey = _.upperFirst(camelCaseKey);
       varName = "_k_" + camelCaseKey;
@@ -100,22 +100,19 @@
       }
       if (setter) {
         this.prototype[setterName] = function(newValue) {
-          var dependant, i, len, ref5;
-          this.emit("change:" + camelCaseKey, newValue, {
-            was: this[varName],
-            key: camelCaseKey
-          });
+          var dependant, i, len, ref6;
+          this.emit("change:" + camelCaseKey);
           if (this._getKanikuData().computedPropsDepends != null) {
-            ref5 = this._getKanikuData().computedPropsDepends[camelCaseKey];
-            for (i = 0, len = ref5.length; i < len; i++) {
-              dependant = ref5[i];
-              this.emit("change:" + dependant, {
-                key: dependant
-              });
+            ref6 = this._getKanikuData().computedPropsDepends[camelCaseKey];
+            for (i = 0, len = ref6.length; i < len; i++) {
+              dependant = ref6[i];
+              this.emit("change:" + dependant);
             }
           }
           return this[varName] = newValue;
         };
+      }
+      if (getter && setter && (updater != null ? updater : true)) {
         this.prototype[updaterName] = function() {
           var args, func;
           func = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
@@ -145,11 +142,13 @@
       if ((base1 = this._getKanikuData()).madePropAccessors == null) {
         base1.madePropAccessors = [];
       }
-      return this._getKanikuData().madePropAccessors[camelCaseKey] = {
-        getter: getterName,
-        setter: setterName,
-        updater: updaterName
-      };
+      madeAccessors = this._getKanikuData().madePropAccessors[camelCaseKey] = {};
+      if (getter || getterProperty) {
+        madeAccessors.getter = getterName;
+      }
+      if (setter || setterProperty) {
+        return madeAccessors.setter = setterName;
+      }
     };
 
     KanikuModel._remakeAccessorsForProp = function(key) {
