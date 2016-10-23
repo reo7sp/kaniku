@@ -37,7 +37,7 @@ module.exports = class KanikuModel
 
         @_makeAccessorsForProp(key, getter: true, setter: true)
 
-  @_makeAccessorsForProp: (key, {getter = false, setter = false, getterProperty = null, setterProperty = null} = {}) ->
+  @_makeAccessorsForProp: (key, {getter = false, setter = false, updater = null, getterProperty = null, setterProperty = null} = {}) ->
     camelCaseKey = _.camelCase(key)
     pascalCaseKey = _.upperFirst(camelCaseKey)
     varName = "_k_#{camelCaseKey}"
@@ -57,11 +57,12 @@ module.exports = class KanikuModel
       @::[getterName] = -> @[varName]
     if setter
       @::[setterName] = (newValue) ->
-        @emit("change:#{camelCaseKey}", newValue, was: @[varName], key: camelCaseKey)
+        @emit("change:#{camelCaseKey}")
         if @_getKanikuData().computedPropsDepends?
           for dependant in @_getKanikuData().computedPropsDepends[camelCaseKey]
-            @emit("change:#{dependant}", key: dependant)
+            @emit("change:#{dependant}")
         @[varName] = newValue
+    if getter and setter and (if updater? then updater else true)
       @::[updaterName] = (func, args...) ->
         func = @[func] if _.isString(func)
         @[setterName](func(@[getterName](), args...))
@@ -76,10 +77,9 @@ module.exports = class KanikuModel
     Object.defineProperty(@::, "#{if hasNoPrefix then '_' else ''}#{camelCaseKey}", propertySettings)
 
     @_getKanikuData().madePropAccessors ?= []
-    @_getKanikuData().madePropAccessors[camelCaseKey] =
-      getter: getterName
-      setter: setterName
-      updater: updaterName
+    madeAccessors = @_getKanikuData().madePropAccessors[camelCaseKey] = {}
+    madeAccessors.getter = getterName if getter
+    madeAccessors.setter = setterName if setter
 
   @_remakeAccessorsForProp: (key) ->
     camelCaseKey = _.camelCase(key)
