@@ -60,7 +60,7 @@
           return function(key, value) {
             var camelCaseKey, varName;
             camelCaseKey = _.camelCase(key);
-            varName = "_k_" + camelCaseKey;
+            varName = "_p_" + camelCaseKey;
             _this._getKanikuData().defaults[varName] = value;
             prettyDefaults[camelCaseKey] = value;
             return _this._makeAccessorsForProp(key, {
@@ -78,7 +78,7 @@
       ref = arg != null ? arg : {}, getter = (ref1 = ref.getter) != null ? ref1 : false, setter = (ref2 = ref.setter) != null ? ref2 : false, updater = (ref3 = ref.updater) != null ? ref3 : null, getterProperty = (ref4 = ref.getterProperty) != null ? ref4 : null, setterProperty = (ref5 = ref.setterProperty) != null ? ref5 : null;
       camelCaseKey = _.camelCase(key);
       pascalCaseKey = _.upperFirst(camelCaseKey);
-      varName = "_k_" + camelCaseKey;
+      varName = "_p_" + camelCaseKey;
       if ((base = this._getKanikuData()).propsWithoutGetterPrefix == null) {
         base.propsWithoutGetterPrefix = [];
       }

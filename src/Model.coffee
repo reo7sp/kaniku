@@ -30,7 +30,7 @@ module.exports = class KanikuModel
     for key, value of defaults
       do (key, value) =>
         camelCaseKey = _.camelCase(key)
-        varName = "_k_#{camelCaseKey}"
+        varName = "_p_#{camelCaseKey}"
 
         @_getKanikuData().defaults[varName] = value
         prettyDefaults[camelCaseKey] = value
@@ -40,7 +40,7 @@ module.exports = class KanikuModel
   @_makeAccessorsForProp: (key, {getter = false, setter = false, updater = null, getterProperty = null, setterProperty = null} = {}) ->
     camelCaseKey = _.camelCase(key)
     pascalCaseKey = _.upperFirst(camelCaseKey)
-    varName = "_k_#{camelCaseKey}"
+    varName = "_p_#{camelCaseKey}"
 
     @_getKanikuData().propsWithoutGetterPrefix ?= []
     hasNoPrefix = @_getKanikuData().propsWithoutGetterPrefix.includes(camelCaseKey)
