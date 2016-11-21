@@ -58,7 +58,7 @@ module.exports = class KanikuModel
     if setter
       @::[setterName] = (newValue) ->
         @emit("change:#{camelCaseKey}")
-        if @_getKanikuData().computedPropsDepends?
+        if @_getKanikuData().computedPropsDepends?[camelCaseKey]?
           for dependant in @_getKanikuData().computedPropsDepends[camelCaseKey]
             @emit("change:#{dependant}")
         @[varName] = newValue

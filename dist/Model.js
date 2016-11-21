@@ -100,12 +100,12 @@
       }
       if (setter) {
         this.prototype[setterName] = function(newValue) {
-          var dependant, i, len, ref6;
+          var dependant, i, len, ref6, ref7;
           this.emit("change:" + camelCaseKey);
-          if (this._getKanikuData().computedPropsDepends != null) {
-            ref6 = this._getKanikuData().computedPropsDepends[camelCaseKey];
-            for (i = 0, len = ref6.length; i < len; i++) {
-              dependant = ref6[i];
+          if (((ref6 = this._getKanikuData().computedPropsDepends) != null ? ref6[camelCaseKey] : void 0) != null) {
+            ref7 = this._getKanikuData().computedPropsDepends[camelCaseKey];
+            for (i = 0, len = ref7.length; i < len; i++) {
+              dependant = ref7[i];
               this.emit("change:" + dependant);
             }
           }
