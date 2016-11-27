@@ -27,11 +27,12 @@ player.on('win', (score) -> postScoreToTheSocialNetwork(score))
 Example of model:
 ```coffeescript
 class PlayerModel extends kaniku.Model
-  @defaults
+  @defaults(
     x: 0 # the view will update this variable
     y: 0
     timeAlive: 0
     timeAliveScoreFactor: 100
+  )
 
   @useUpdates()
 
@@ -43,7 +44,7 @@ class PlayerModel extends kaniku.Model
     @x + @timeAlive * @timeAliveScoreFactor
 ```
 ```coffeescript
-player = new PlayerModel(timeAliveScoreFactor: 25)
+player = new PlayerModel(timeAliveScoreFactor: 25) # you can override initial values
 
 player.on 'change:score', ->
   sayPlayerThatHeIsGood()
@@ -51,13 +52,13 @@ player.on 'change:score', ->
 player.setX(10)
 ```
 
-`defaults` static method sets initial values of model and also generates getters and setters for all listed variables. So it's important to list variables even with null initial values to let getters and setters to be automatically generated.
+`defaults` static method sets initial values of a model and also generates getters and setters for all listed variables. So it's important to list variables even with null initial values to let getters and setters to be automatically generated.
 
-Getters and setters are available both method-style (`m.getX()`, `m.setX(1)`) and property-style (`m.x`, `m.x = 1`). 
+Getters and setters are available both method-style (`m.getX()`, `m.setX(1)`) and property-style (`m.x`, `m.x = 1`). We recommend using property-style internally in a model and method-style when accessing model.
 
 Generated setters emit event `change:VARIABLE_NAME`.
 
-You can define computed variables via `computed` static method. This method makes change event of this computed variable to be emited on depending variable change. Also it creates property alias for getter.
+You can define computed variables via `computed` static method. This method makes change event of this computed variable to be emited on depending variables change. Also it creates property alias for getter.
 
 `useUpdates` method requests controller to call model's `update` method on every frame. The first argument of model's `update` method is time between frames in seconds.
 
@@ -84,7 +85,7 @@ Example:
 ```coffeescript
 class FirstLevelController extends kaniku.Controller
   createModels: ->
-    @playerModel = new PlayerModel(x: 0, y: 100) # you can override initial values
+    @playerModel = new PlayerModel(x: 0, y: 100)
     @addModel(@playerModel)
 
     @npcModel = new FirstLevelNPCModel()
@@ -119,5 +120,3 @@ class FirstLevelController extends kaniku.Controller
       @player.on 'change:x', (x) ->
         generateGameWorldAfter(x)
 ```
-
-
