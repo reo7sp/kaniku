@@ -6,7 +6,7 @@ Kaniku (Japanese: かにく) means flesh of a coconut.
 ## Model
 Model is the main source of information about game objects. All data flow must come through models.
 
-Models are able to emit events. Views, other models, etc. are allowed to emit events on behalf of the model.
+Models are able to emit events. Views, other models, etc. are allowed to emit events on behalf of the model too.
 
 Method to emit event:
 ```coffeescript
@@ -36,16 +36,22 @@ class PlayerModel extends kaniku.Model
   @useUpdates()
 
   update: (dt) ->
-    @setTimeAlive(@getTimeAlive() + dt)
+    @timeAlive += dt
 
   @computed 'score', depends: ['x', 'timeAlive', 'timeAliveScoreFactor']
   getScore: ->
-    @getX() + @getTimeAlive() * @getTimeAliveScoreFactor()
+    @x + @timeAlive * @timeAliveScoreFactor
+```
+```coffeescript
+player = new PlayerModel(timeAliveScoreFactor: 25)
+
+player.on 'change:score', ->
+  sayPlayerThatHeIsGood()
+  
+player.setX(10)
 ```
 
-`defaults` static method sets initial values of model and also generates getters and setters for all listed variables.
-
-So it's important to list variables even with null initial values to let getters and setters to be automatically generated.
+`defaults` static method sets initial values of model and also generates getters and setters for all listed variables. So it's important to list variables even with null initial values to let getters and setters to be automatically generated.
 
 Getters and setters are available both method-style (`m.getX()`, `m.setX(1)`) and property-style (`m.x`, `m.x = 1`). 
 
@@ -53,15 +59,15 @@ Generated setters emit event `change:VARIABLE_NAME`.
 
 You can define computed variables via `computed` static method. This method makes change event of this computed variable to be emited on depending variable change. Also it creates property alias for getter.
 
-`useUpdates` method requests controller to call model's `update` method on every frame. The first argument of `update` method is time between frames in seconds.
+`useUpdates` method requests controller to call model's `update` method on every frame. The first argument of model's `update` method is time between frames in seconds.
 
-To get defaults of model you can use method `getDefaults` which is available both for class and for instances. To get all variables of model (including computed) you can use method `getData`.
+To get defaults of model use method `getDefaults` which is available both for class and for instances. To get all variables of model (including computed) use method `getData`.
 
 
 ## View
-View provides interface between model and real world. Usually views are cocos2d-x Node objects which render game objects on the user's screen.
+View provides interface between model and real world. Views are usually cocos2d-x Node objects, which render game objects on the user's screen.
 
-There are no kaniku class to extend from.
+There are no Kaniku class to extend from.
 
 Views don't communicate with each other. They communicate through models.
 
@@ -100,7 +106,7 @@ class FirstLevelController extends kaniku.Controller
     # Suppose this object call physics engine internally and then
     # update player model with new coodinates.
     #
-    # Score view will receive event that something was changed,
+    # Score view will receive event that something was changed in the model,
     # model will compute new score and then
     # score view will finally update the label on screen using model data.
     playerView.setPlayer(@playerModel)
