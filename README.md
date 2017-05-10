@@ -3,6 +3,8 @@ MVC microframework for cocos2d-x javascript games.
 
 Kaniku (Japanese: かにく) means flesh of a coconut.
 
+We recommend to use [cocos-starter-kit](https://github.com/reo7sp/cocos-starter-kit) for your games with kaniku.
+
 ## Model
 Model is the main source of information about game objects. All data flow must come through models.
 
